@@ -93,5 +93,17 @@ public class ProdutoClienteController {
         return ResponseEntity.status(HttpStatus.OK).body("Produto foi Deletado!!!");
     }
 
+    @GetMapping("/pendentes")
+    public ResponseEntity<List<ProdutoCliente>> listarProdutosComOfertasPendentes() {
+        List<ProdutoCliente> produtos = produtoClienteService.listarProdutosComOfertasPendentes();
+        if (produtos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(produtos);
+    }
+
+
+
+
 
 }

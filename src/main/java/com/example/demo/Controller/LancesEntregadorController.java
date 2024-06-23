@@ -84,6 +84,11 @@ public class LancesEntregadorController {
             LancesEntregador oferta = ofertaOptional.get();
             oferta.setStatus("Aceito");
             service.lancesEntregadorSalvar(oferta);
+
+            ProdutoCliente produto = oferta.getProdutoCliente();
+            produto.setOfertaAceita(true); // Atualiza o estado para true
+            clienteService.postarProdutoCliente(produto); // Salva as alterações no produto
+
             return ResponseEntity.ok("Oferta aceita com sucesso e notificação enviada.");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Oferta não encontrada!");

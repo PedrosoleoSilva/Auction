@@ -31,9 +31,18 @@ public class ProdutoClienteService {
     public List<ProdutoCliente> produtoClienteList(){
         return repository.findAll();
     }
+
+    public List<ProdutoCliente> listarProdutosComOfertasPendentes() {
+        return repository.findByOfertaAceitaFalse();
+    }
+
+
+
     public ProdutoCliente postarProdutoCliente(ProdutoCliente produtoCliente) {
         return repository.save(produtoCliente);
     }
+
+
     public Optional<ProdutoCliente> buscarProdutoid(Integer id){
         return repository.findById(id);
     }
@@ -68,5 +77,7 @@ public class ProdutoClienteService {
     public List<ProdutoCliente> listarProdutosPorClienteIdWithLances(Integer clienteId) {
         return repository.findByClienteIdWithLances(clienteId);
     }
+
+
 
 }

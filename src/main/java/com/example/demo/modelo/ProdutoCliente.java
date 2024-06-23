@@ -70,6 +70,10 @@ public class ProdutoCliente {
     @Column(name= "FOTO", nullable = false, columnDefinition = "LONGTEXT")
     private String  foto;
 
+    private boolean OfertaAceita = false;
+
     public ProdutoCliente() {
     }
+
+
 }

@@ -22,4 +22,9 @@ public interface ProdutoClienteRepository extends JpaRepository<ProdutoCliente, 
 
     @Query("SELECT p FROM ProdutoCliente p LEFT JOIN FETCH p.lances l WHERE p.cliente.id = :clienteId")
     List<ProdutoCliente> findByClienteIdWithLances(Integer clienteId);
+
+
+    List<ProdutoCliente> findByOfertaAceitaFalse();
+
+
 }
