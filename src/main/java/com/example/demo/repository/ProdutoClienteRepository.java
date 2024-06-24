@@ -17,14 +17,8 @@ public interface ProdutoClienteRepository extends JpaRepository<ProdutoCliente, 
     // Novo método para buscar todos os produtos de um cliente específico
     List<ProdutoCliente> findAllByClienteId(@Param("clienteId") Integer clienteId);
 
-    @Query("SELECT p FROM ProdutoCliente p LEFT JOIN FETCH p.lances WHERE p.cliente.id = :clienteId AND p.lances IS NOT EMPTY")
-    List<ProdutoCliente> findProdutosPorClienteComOfertas(@Param("clienteId") Integer clienteId);
-
-    @Query("SELECT p FROM ProdutoCliente p LEFT JOIN FETCH p.lances l WHERE p.cliente.id = :clienteId")
-    List<ProdutoCliente> findByClienteIdWithLances(Integer clienteId);
 
 
-    List<ProdutoCliente> findByOfertaAceitaFalse();
 
 
 }

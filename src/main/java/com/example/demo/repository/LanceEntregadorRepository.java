@@ -15,23 +15,14 @@ public interface LanceEntregadorRepository extends JpaRepository<LancesEntregado
 
     List<LancesEntregador> findByProdutoClienteId(Integer idProduto);
 
-
-
-    @Query("SELECT l FROM LancesEntregador l WHERE l.cliente.id = :clienteId")
-    List<LancesEntregador> listarProdutosComOfertas(@Param("clienteId") Integer clienteId);
-
+    //query encontra todos os lances feitos para um determinado produto do cliente e os detalhes produto
     @Query("SELECT l FROM LancesEntregador l JOIN FETCH l.produtoCliente p JOIN FETCH p.cliente c WHERE p.cliente.id = :clienteId")
     List<LancesEntregador> findLancesWithProductDetailsByClienteId(@Param("clienteId") Integer clienteId);
-    @Query("SELECT l FROM LancesEntregador l JOIN FETCH l.produtoCliente WHERE l.cliente.id = :clienteId")
-    List<LancesEntregador> findByProdutoCliente_Cliente_Id(@Param("clienteId") Integer clienteId);
-
-    @Query("SELECT DISTINCT l.produtoCliente FROM LancesEntregador l WHERE l.produtoCliente.cliente.id = :clienteId")
-    List<ProdutoCliente> findProdutosComOfertasRecebidasPorCliente(@Param("clienteId") Integer clienteId);
-
-    @Modifying
+    @Modifying  // query deleta todos os lances associados a um produto.
     @Query("DELETE FROM LancesEntregador l WHERE l.produtoCliente.id = :produtoClienteId")
     void deleteByProdutoClienteId(@Param("produtoClienteId") Integer produtoClienteId);
 
+    //encontra todos os lances aceitos por um cliente para retornar ao entregador as ofertas aceitas
     @Query("SELECT l FROM LancesEntregador l WHERE l.cliente.id = :clienteId AND l.status = 'Aceito'")
     List<LancesEntregador> findByClienteIdAndStatus(@Param("clienteId") Integer clienteId);
 

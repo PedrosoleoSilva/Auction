@@ -32,34 +32,24 @@ public class ProdutoClienteService {
         return repository.findAll();
     }
 
-    public List<ProdutoCliente> listarProdutosComOfertasPendentes() {
-        return repository.findByOfertaAceitaFalse();
-    }
-
-
 
     public ProdutoCliente postarProdutoCliente(ProdutoCliente produtoCliente) {
         return repository.save(produtoCliente);
     }
 
-
     public Optional<ProdutoCliente> buscarProdutoid(Integer id){
         return repository.findById(id);
     }
-    public List<ProdutoCliente> listarProdutosPorClienteComOfertas(Integer clienteId) {
-        return repository.findProdutosPorClienteComOfertas(clienteId);
-    }
+
+
     // Novo método para listar todos os produtos de um cliente específico
     public List<ProdutoCliente> listarTodosProdutosPorClienteId(Integer clienteId) {
         return repository.findAllByClienteId(clienteId);
     }
-    public void deletarProduto(Optional<ProdutoCliente> produtoCliente){
-        repository.delete(produtoCliente.get());
-    }
     @Transactional
     public void deletarProdutoPorId(Integer id){
         Optional<ProdutoCliente> produto = repository.findById(id);
-        if (produto.isPresent()) {
+        if (produto.isPresent()) { //bsucar produto
             List<LancesEntregador> lances = lancesRepository.findByProdutoClienteId(id);
             // Deletar todas as notificações associadas a cada lance
             for (LancesEntregador lance : lances) {
@@ -71,13 +61,4 @@ public class ProdutoClienteService {
             repository.deleteById(id);
         }
     }
-    public List<ProdutoCliente> listarProdutosPorClienteId(Integer clienteId) {
-        return repository.findByClienteId(clienteId);
-    }
-    public List<ProdutoCliente> listarProdutosPorClienteIdWithLances(Integer clienteId) {
-        return repository.findByClienteIdWithLances(clienteId);
-    }
-
-
-
 }

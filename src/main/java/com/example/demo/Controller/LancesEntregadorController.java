@@ -33,26 +33,26 @@ public class LancesEntregadorController {
     @PostMapping()
     public ResponseEntity<Object> fazerLance(@RequestBody LancesEntregador lances) {
         lances.setData(LocalDate.now());
-        if (lances.getCliente() == null) {
+        if (lances.getCliente() == null) { //verifique se a oferta esta associado ao clienteid
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A oferta deve estar associada a um cliente.");
         }
         LancesEntregador lancesEntregador = service.lancesEntregadorSalvar(lances);
 
-        // Recuperar informações do produto associado à oferta
+        // Recuperar informações do produto associado à oferta para poder enviar notificação
         Integer produtoId = lances.getProdutoCliente().getId();
         Optional<ProdutoCliente> produtoOptional = clienteService.buscarProdutoid(produtoId);
         if (produtoOptional.isPresent()) {
             ProdutoCliente produto = produtoOptional.get();
             String nomeProduto = produto.getNomeProduto();
             Double valorLance = lances.getValorLance();
-            CadastroCliente donoProduto = produto.getCliente();
+            CadastroCliente donoProduto = produto.getCliente(); //pega de quem e o dono do produto para enviar notificação
 
             String tokenDispositivoDonoProduto = donoProduto.getExpoPushToken();
 
-            // Construa a mensagem de notificação
+            // Construa a mensagem de notificação para enviar ao cliente
             String mensagemNotificacao = String.format("Nova oferta recebida para o produto %s: R$ %.2f", nomeProduto, valorLance);
 
-            // Criar notificação no sistema
+            // Criar notificação no sistema e salva na tabela Notificação no banco
             notificacaoService.criarNotificacao(donoProduto, mensagemNotificacao, lancesEntregador, "nova_oferta");
 
             // Retornar a resposta da solicitação
@@ -77,7 +77,7 @@ public class LancesEntregadorController {
         return ResponseEntity.status(HttpStatus.OK).body("A oferta foi deletada!");
     }
 
-    @PutMapping("/{id}/statusAceito")
+    @PutMapping("/{id}/statusAceito") //metodo para aceitar oferta entrega
     public ResponseEntity<Object> statusAceito(@PathVariable("id") Integer id) {
         Optional<LancesEntregador> ofertaOptional = service.buscarLanceId(id);
         if (ofertaOptional.isPresent()) {
@@ -86,26 +86,15 @@ public class LancesEntregadorController {
             service.lancesEntregadorSalvar(oferta);
 
             ProdutoCliente produto = oferta.getProdutoCliente();
-            produto.setOfertaAceita(true); // Atualiza o estado para true
+            produto.setOfertaAceita(true); // Atualiza o estado para true na tabela produto, para poder listar somentes produtos que nao foram aceitos as oferta de entrega
             clienteService.postarProdutoCliente(produto); // Salva as alterações no produto
 
-            return ResponseEntity.ok("Oferta aceita com sucesso e notificação enviada.");
+            return ResponseEntity.ok("Oferta aceita com sucesso e notificação enviada."); //esta sendo feita uma futura notificaçao
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Oferta não encontrada!");
         }
     }
-
-
-    @GetMapping("/produtosComOfertas/{clienteId}")
-    public ResponseEntity<List<ProdutoCliente>> listarProdutosComOfertas(@PathVariable Integer clienteId) {
-        List<ProdutoCliente> produtos = service.listarProdutosComOfertasRecebidas(clienteId);
-        if (produtos.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.ok(produtos);
-    }
-
-    @GetMapping("/ofertasRecebidasDetalhadas/{clienteId}")
+    @GetMapping("/ofertasRecebidasDetalhadas/{clienteId}") //exibe a oferta do cliente do produto recebeu
     public ResponseEntity<List<LancesEntregador>> listarOfertasRecebidasDetalhadas(@PathVariable Integer clienteId) {
         List<LancesEntregador> lances = service.listarOfertasRecebidasComDetalhes(clienteId);
         if (lances.isEmpty()) {
@@ -127,24 +116,7 @@ public class LancesEntregadorController {
         }
     }
 
-    @GetMapping("/produto/{id}")
-    public ResponseEntity<List<LancesEntregador>> listarOfertasPorProduto(@PathVariable("id") Integer idProduto) {
-        List<LancesEntregador> ofertas = service.listarOfertasPorProduto(idProduto);
-        return ResponseEntity.status(HttpStatus.OK).body(ofertas);
-    }
-
-    @PutMapping("/produto/{id}")
-    public ResponseEntity<List<LancesEntregador>> aceitarEntrega(@PathVariable("id") Integer idProduto) {
-        List<LancesEntregador> ofertas = service.listarOfertasPorProduto(idProduto);
-        return ResponseEntity.status(HttpStatus.OK).body(ofertas);
-    }
-
-    @GetMapping("/ofertas-recebidas")
-    public ResponseEntity<List<LancesEntregador>> listarOfertasRecebidasPorCliente(@RequestParam("clienteId") Integer clienteId) {
-        List<LancesEntregador> ofertasRecebidas = service.listarOfertasRecebidasPorCliente(clienteId);
-        return ResponseEntity.status(HttpStatus.OK).body(ofertasRecebidas);
-    }
-    @GetMapping("/ofertasAceitas/{clienteId}")
+    @GetMapping("/ofertasAceitas/{clienteId}") //lista ao entregador as suas ofertas de entrega aceita
     public ResponseEntity<List<LancesEntregador>> listarOfertasAceitasPorCliente(@PathVariable Integer clienteId) {
         List<LancesEntregador> ofertasAceitas = service.listarOfertasAceitasPorCliente(clienteId);
         if (ofertasAceitas.isEmpty()) {

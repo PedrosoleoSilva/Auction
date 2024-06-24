@@ -38,10 +38,10 @@ public class ProdutoClienteController {
     @PutMapping("/{id}")
     public ResponseEntity<Object> alterarProduto(@PathVariable(value = "id") Integer id, @RequestBody ProdutoCliente produtoCliente){
         Optional<ProdutoCliente> p = produtoClienteService.buscarProdutoid(id);
-        if(p.isEmpty()){
+        if(p.isEmpty()){ //verifica se o produto existe
             return ResponseEntity.status(HttpStatus.OK).body("Produto não Encontrado!!!");
         }
-        ProdutoCliente produtoCliente1 = p.get();
+        ProdutoCliente produtoCliente1 = p.get();  //altera as informaçoes do produto
         produtoCliente1.setDescricao(produtoCliente.getDescricao());
         produtoCliente1.setFoto(produtoCliente.getFoto());
         produtoCliente1.setLocalOrigemEstado(produtoCliente1.getLocalOrigemEstado());
@@ -52,31 +52,7 @@ public class ProdutoClienteController {
         return ResponseEntity.status(HttpStatus.OK).body(produtoClienteService.postarProdutoCliente(produtoCliente1));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deletarCadastro(@PathVariable(value = "id") Integer id, @RequestBody CadastroCliente cliente){
-        Optional<ProdutoCliente> p = produtoClienteService.buscarProdutoid(id);
-        if(p.isEmpty()){
-            return ResponseEntity.status(HttpStatus.OK).body("Cadastro não Encontrado!!!");
-        }
-        produtoClienteService.deletarProduto(p);
-        return ResponseEntity.status(HttpStatus.OK).body("Cadastro foi Deletado!!!");
-    }
-    @GetMapping("/porCliente/{clienteId}")
-    public ResponseEntity<List<ProdutoCliente>> listarProdutosPorCliente(@PathVariable Integer clienteId) {
-        List<ProdutoCliente> produtos = produtoClienteService.listarProdutosPorClienteIdWithLances(clienteId);
-        if (produtos.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.ok(produtos);
-    }
-    @GetMapping("/porClienteComOfertas/{clienteId}")
-    public ResponseEntity<List<ProdutoCliente>> listarProdutosPorClienteComOfertas(@PathVariable Integer clienteId) {
-        List<ProdutoCliente> produtos = produtoClienteService.listarProdutosPorClienteComOfertas(clienteId);
-        if (produtos.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.ok(produtos);
-    }
+
     // Novo endpoint para listar todos os produtos de um cliente específico
     @GetMapping("/todosPorCliente/{clienteId}")
     public ResponseEntity<List<ProdutoCliente>> listarTodosProdutosPorCliente(@PathVariable Integer clienteId) {
@@ -93,14 +69,6 @@ public class ProdutoClienteController {
         return ResponseEntity.status(HttpStatus.OK).body("Produto foi Deletado!!!");
     }
 
-    @GetMapping("/pendentes")
-    public ResponseEntity<List<ProdutoCliente>> listarProdutosComOfertasPendentes() {
-        List<ProdutoCliente> produtos = produtoClienteService.listarProdutosComOfertasPendentes();
-        if (produtos.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.ok(produtos);
-    }
 
 
 
